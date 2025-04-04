@@ -16,7 +16,7 @@ constructor(@InjectModel(User) private userRepository: typeof User,
 
 async createUser(dto:CreateUserDto ){
     const user = await this.userRepository.create(dto);
-    const role = await this.roleService.getRoleByValue("USER")
+    const role = await this.roleService.getRoleByValue("ADMIN")
     if (!role) {
         throw new Error("Роль 'USER' не знайдена");
     }
