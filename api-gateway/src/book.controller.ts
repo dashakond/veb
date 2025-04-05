@@ -39,7 +39,7 @@ export class BooksController {
   @UseGuards(AdminGuard) // Можна також захистити оновлення
   async update(@Param('id') id: string, @Body() updateBookDto: any) {
     return this.bookService
-      .send({ cmd: 'update_book' }, { id: +id, ...updateBookDto })
+    .send({ cmd: 'update_book' }, { id: +id, updateBookDto })
       .toPromise();
   }
 }
