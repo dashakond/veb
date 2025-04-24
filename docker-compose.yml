@@ -1,0 +1,107 @@
+version: '3.8'
+
+services:
+
+  # === Спільна PostgreSQL база даних ===
+  nesr_db:
+    image: postgres:14
+    container_name: nesr_db
+    environment:
+      POSTGRES_DB: nest-course
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  # === RabbitMQ Broker ===
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - backend
+
+  # === User Service ===
+  user-service:
+    build: ./user-service
+    container_name: user-service
+    environment:
+      DB_HOST: nesr_db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: nest-course
+      RABBITMQ_HOST: amqp://guest:guest@rabbitmq:5672
+    depends_on:
+      - nesr_db
+      - rabbitmq
+    ports:
+      - "5001:5001"
+    networks:
+      - backend
+
+  # === Book Service ===
+  book-service:
+    build: ./book-service
+    container_name: book-service
+    environment:
+      DB_HOST: nesr_db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: nest-course
+      RABBITMQ_HOST: amqp://guest:guest@rabbitmq:5672
+    depends_on:
+      - nesr_db
+      - rabbitmq
+    ports:
+      - "3006:3006"
+    networks:
+      - backend
+
+  # === Reading Service ===
+  reading-service:
+    build: ./reading-service
+    container_name: reading-service
+    environment:
+      DB_HOST: nesr_db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: nest-course
+      RABBITMQ_HOST: amqp://guest:guest@rabbitmq:5672
+    depends_on:
+      - nesr_db
+      - rabbitmq
+    ports:
+      - "3007:3007"
+    networks:
+      - backend
+
+  # === API Gateway ===
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    depends_on:
+      - user-service
+      - book-service
+      - reading-service
+    ports:
+      - "8080:8080"
+    networks:
+      - backend
+
+# Окремо вказуємо томи
+volumes:
+  pgdata:
+
+# Окремо вказуємо мережі
+networks:
+  backend:
+    driver: bridge
