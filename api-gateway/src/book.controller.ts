@@ -7,6 +7,7 @@ import {
   Param,
   Put,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { AdminGuard } from './admin.guard'; // ОНОВИ ШЛЯХ при потребі
@@ -16,7 +17,7 @@ export class BooksController {
   constructor(@Inject('BOOK_SERVICE') private readonly bookService: ClientProxy) {}
 
   @Post()
-  @UseGuards(AdminGuard)
+  
   async create(@Body() createBookDto: any) {
     return this.bookService
       .send({ cmd: 'create_book' }, createBookDto)
@@ -24,8 +25,20 @@ export class BooksController {
   }
 
   @Get()
-  async findAll() {
-    return this.bookService.send({ cmd: 'get_books' }, {}).toPromise();
+  async findAll(
+    @Query('genre') genre?: string,
+    @Query('author') author?: string,
+    @Query('year') year?: string,
+  ) {
+    const filters: any = {
+      ...(genre && { genre }),
+      ...(author && { author }),
+      ...(year && { year: +year }),
+    };
+
+    return this.bookService
+      .send({ cmd: 'get_books' }, filters)
+      .toPromise();
   }
 
   @Get(':id')
@@ -36,7 +49,7 @@ export class BooksController {
   }
 
   @Put(':id')
-  @UseGuards(AdminGuard) // Можна також захистити оновлення
+  @UseGuards(AdminGuard) 
   async update(@Param('id') id: string, @Body() updateBookDto: any) {
     return this.bookService
     .send({ cmd: 'update_book' }, { id: +id, updateBookDto })

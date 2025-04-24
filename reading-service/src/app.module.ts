@@ -9,7 +9,7 @@ import { ClientProxyFactory, Transport } from '@nestjs/microservices';
   imports: [
     SequelizeModule.forRoot({
       dialect: 'postgres',
-      host: 'localhost',
+      host: 'nesr_db',
       port: 5432,
       username: 'postgres',
       password: 'postgres', // замініть на свої налаштування
@@ -29,7 +29,7 @@ import { ClientProxyFactory, Transport } from '@nestjs/microservices';
         return ClientProxyFactory.create({
           transport: Transport.RMQ,
           options: {
-            urls: ['amqp://localhost'],
+            urls: ['amqp://guest:guest@rabbitmq:5672'],
             queue: 'user-service',
             queueOptions: {
               durable: false, // Додано параметр durable для забезпечення стійкості черги
@@ -44,7 +44,7 @@ import { ClientProxyFactory, Transport } from '@nestjs/microservices';
         return ClientProxyFactory.create({
           transport: Transport.RMQ,
           options: {
-            urls: ['amqp://localhost'],
+            urls: ['amqp://guest:guest@rabbitmq:5672'],
             queue: 'book_queue', // Черга для перевірки книг
           },
         });

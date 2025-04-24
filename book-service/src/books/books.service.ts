@@ -30,15 +30,15 @@ export class BooksService {
 
   async update(id: number, updateBookDto: UpdateBookDto): Promise<Book> {
     const [affectedCount, updatedBooks] = await this.bookModel.update(updateBookDto, {
-      where: { id }, // фільтруємо по ID
-      returning: true, // щоб отримати оновлені дані після оновлення
+      where: { id },
+      returning: true,
     });
     
     if (affectedCount === 0) {
       throw new NotFoundException('Книга не знайдена');
     }
   
-    return updatedBooks[0]; // Повертаємо перший оновлений запис
+    return updatedBooks[0]; 
   }
   
 }

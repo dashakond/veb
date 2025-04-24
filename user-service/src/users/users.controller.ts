@@ -6,6 +6,7 @@ import { Roles } from 'src/auth/roles-auth.decorator';
 import { RolesGuard } from 'src/auth/roles-guard';
 import { AddRoleDto } from 'src/roles/dto/add-role.dto';
 import { UpdateUserDto } from 'src/users/dto/update-user.dto';
+import { Payload,MessagePattern } from '@nestjs/microservices';
 
 @Controller('users')
 export class UsersController {
@@ -23,10 +24,12 @@ export class UsersController {
     return this.userService.getAllUsers();
   }
 
-  @Roles('ADMIN')
-  @UseGuards(RolesGuard)
-  @Post('/role')
-  addRole(@Body() dto: AddRoleDto) {
+  // @Roles('ADMIN')
+  // @UseGuards(RolesGuard)
+  
+ 
+  @MessagePattern('add-role')
+  async addRoleByMessage(@Payload() dto: AddRoleDto) {
     return this.userService.addRole(dto);
   }
 
@@ -49,5 +52,11 @@ export class UsersController {
   @Delete(':id')
   delete(@Param('id') id: number) {
     return this.userService.deleteUser(id);
+  }
+  // Мікросервіс для перевірки існування користувача
+  @MessagePattern('get-user')
+  async getUserById(@Payload() userId: string): Promise<boolean> {
+    const user = await this.userService.getUserById(Number(userId));
+    return !!user;
   }
 }

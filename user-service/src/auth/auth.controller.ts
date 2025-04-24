@@ -14,6 +14,11 @@ export class AuthController {
 
   @MessagePattern({ cmd: 'login_user' })
   async login(data: CreateUserDto) {
-    return this.authService.login(data);
+    try {
+      return await this.authService.login(data);
+    } catch (error) {
+      console.error('Login microservice error:', error);
+      return { status: 'error', message: error.message || 'Internal server error' };
+    }
   }
 }

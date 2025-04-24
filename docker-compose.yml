@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
 
-  # === Спільна PostgreSQL база даних ===
+  # === PostgreSQL база даних ===
   nesr_db:
     image: postgres:14
     container_name: nesr_db
@@ -97,11 +97,23 @@ services:
     networks:
       - backend
 
-# Окремо вказуємо томи
+  # === PgAdmin (графічний інтерфейс до PostgreSQL) ===
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - nesr_db
+    networks:
+      - backend
+
 volumes:
   pgdata:
 
-# Окремо вказуємо мережі
 networks:
   backend:
     driver: bridge

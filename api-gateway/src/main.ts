@@ -8,8 +8,9 @@ dotenv.config();
 async function start() {
     const app = await NestFactory.create(AppModule);
 
-    const rabbitMqUrl = process.env.RABBITMQ_URL; 
-    const rabbitMqQueue = process.env.RABBITMQ_QUEUE;
+    const rabbitMqUrl = 'amqp://guest:guest@rabbitmq:5672';
+    const rabbitMqQueue = 'user-service';
+    
 
     if (!rabbitMqUrl || !rabbitMqQueue) {
         throw new Error("RABBITMQ_URL або RABBITMQ_QUEUE не визначено у змінних середовища");
@@ -18,17 +19,17 @@ async function start() {
     app.connectMicroservice<MicroserviceOptions>({
         transport: Transport.RMQ,
         options: {
-            urls: [rabbitMqUrl], // Масив містить тільки string
-            queue: rabbitMqQueue,
-            queueOptions: {
-                durable: false,
-            },
+          urls: ['amqp://guest:guest@rabbitmq:5672'],
+          queue: 'user-service',
+          queueOptions: {
+            durable: false,
+          },
         },
-    });
+      });
 
     await app.startAllMicroservices();
-    await app.listen(process.env.PORT || 5000);
-    console.log(`Server started on port ${process.env.PORT || 5000}`);
+    await app.listen(8080); 
+      console.log(`Server started on port 8080`);
 }
 
 start();

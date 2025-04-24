@@ -34,5 +34,13 @@ async findOneBook(@Payload() payload: { id: number }) {
   
     return { message: 'Book updated successfully' };
   }
-  
+  @MessagePattern('get-book')
+  async getBookById(@Payload() bookId: string): Promise<boolean> {
+    try {
+      const book = await this.booksService.findOne(Number(bookId));
+      return !!book;
+    } catch (error) {
+      return false;
+    }
+  }
 }

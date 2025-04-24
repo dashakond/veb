@@ -8,14 +8,15 @@ export class JwtMiddleware {
 
   use(req: Request, res: Response, next: NextFunction): void {
     const token = req.headers['authorization']?.split(' ')[1];
-    this.logger.log('Received token: ' + token);  // Логування токена
+     
 
     if (!token) {
       this.logger.warn('No token provided');
       throw new UnauthorizedException('Token is missing');
     }
 
-    const secretKey = process.env.JWT_SECRET;
+    const secretKey = 'secret_key_safasf';
+
 
     if (!secretKey) {
       this.logger.warn('JWT_SECRET is missing in environment variables');
@@ -24,16 +25,16 @@ export class JwtMiddleware {
 
     try {
       const decoded = jwt.verify(token, secretKey) as { roles: Array<{ value: string }> };
-      this.logger.log('Decoded token: ' + JSON.stringify(decoded));  // Логування розшифрованого токена
+      this.logger.log('Decoded token: ' + JSON.stringify(decoded));  
 
-      // 🔐 Перевірка на роль ADMIN
+     
       if (!decoded.roles?.some(role => role.value === 'ADMIN')) {
         this.logger.warn('User is not admin');
         throw new UnauthorizedException('Only admin can perform this action');
       }
 
-      req.user = decoded;  // Додаємо decoded токен в req.user
-      this.logger.log('User added to request: ' + JSON.stringify(req.user));  // Логування user в req
+      req.user = decoded;  
+      this.logger.log('User added to request: ' + JSON.stringify(req.user));  
 
       next();
     } catch (error) {
